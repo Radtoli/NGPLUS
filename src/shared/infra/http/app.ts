@@ -13,6 +13,9 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   await app.register(cors, {
     origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-password'],
   });
 
   await app.register(swagger, {
@@ -22,8 +25,7 @@ export async function buildApp(): Promise<FastifyInstance> {
         description: 'API Documentation',
         version: '1.0.0',
       },
-      host: 'localhost:3333',
-      schemes: ['http'],
+      schemes: ['http', 'https'],
       consumes: ['application/json'],
       produces: ['application/json'],
       tags: [
@@ -49,8 +51,33 @@ export async function buildApp(): Promise<FastifyInstance> {
       docExpansion: 'list',
       deepLinking: false,
     },
+    uiHooks: {
+      onRequest: function (_request, _reply, next) { next(); },
+      preHandler: function (_request, _reply, next) { next(); }
+    },
     staticCSP: true,
     transformStaticCSP: (header) => header,
+    transformSpecificationClone: true,
+  });
+
+  app.get('/swagger.json', async (request, reply) => {
+    const swaggerObject: any = app.swagger();
+    const protocol = request.headers['x-forwarded-proto'] || request.protocol;
+    const host = request.headers['x-forwarded-host'] || request.hostname;
+
+    swaggerObject.host = host;
+    swaggerObject.schemes = protocol === 'https' ? ['https', 'http'] : ['http', 'https'];
+
+    return reply.send(swaggerObject);
+  });
+
+  app.get('/', {
+    schema: {
+      summary: 'Redirect to API documentation',
+      description: 'Redirects to the Swagger API documentation',
+    }
+  }, async (_request, reply) => {
+    return reply.redirect('/docs');
   });
 
   app.register(userRouter, { prefix: '/users' });
