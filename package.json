@@ -1,0 +1,44 @@
+{
+  "name": "ngplustest",
+  "version": "1.0.0",
+  "description": "Backend project with Node.js, TypeScript and Fastify",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "eslint src --ext .ts",
+    "test": "jest",
+    "typeorm": "ts-node-dev ./node_modules/typeorm/cli.js -d src/shared/infra/databases/postgresDataSource.ts"
+  },
+  "keywords": [
+    "nodejs",
+    "typescript",
+    "fastify"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cors": "^8.5.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
+    "@sinclair/typebox": "^0.34.41",
+    "awilix": "^12.0.5",
+    "dotenv": "^17.2.3",
+    "fastify": "^4.26.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
+    "typeorm": "^0.3.27",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
