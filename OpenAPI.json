@@ -1,0 +1,2261 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "NGPlusTest API",
+    "description": "API Documentation",
+    "version": "1.0.0"
+  },
+  "definitions": {
+
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "description": "Health check endpoint",
+        "tags": [
+          "health"
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string"
+                },
+                "timestamp": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/register": {
+      "post": {
+        "summary": "Register a new user",
+        "description": "Creates a new user account with username, email and password",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "minLength": 3,
+                  "maxLength": 30,
+                  "type": "string"
+                },
+                "email": {
+                  "format": "email",
+                  "type": "string"
+                },
+                "password": {
+                  "minLength": 6,
+                  "type": "string"
+                },
+                "password_confirmation": {
+                  "minLength": 6,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "username",
+                "email",
+                "password",
+                "password_confirmation"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "User created successfully"
+          },
+          "400": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Password confirmation does not match",
+                    "Invalid input"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Email already in use"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login user",
+        "description": "Authenticates a user and returns a JWT token",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "format": "email",
+                  "type": "string"
+                },
+                "password": {
+                  "minLength": 6,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "email",
+                "password"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                },
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "string"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "email": {
+                      "format": "email",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user_id",
+                    "username",
+                    "email"
+                  ]
+                }
+              },
+              "required": [
+                "token",
+                "user"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/users/update": {
+      "put": {
+        "summary": "Update user",
+        "description": "Updates the authenticated user information (username, email, password). Requires JWT token.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "minLength": 3,
+                  "maxLength": 30,
+                  "type": "string"
+                },
+                "email": {
+                  "format": "email",
+                  "type": "string"
+                },
+                "password": {
+                  "minLength": 6,
+                  "type": "string"
+                },
+                "password_confirmation": {
+                  "minLength": 6,
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          },
+          "400": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Password confirmation does not match",
+                    "Invalid input"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "409": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Email already in use"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/users/delete": {
+      "delete": {
+        "summary": "Delete user",
+        "description": "Deletes the authenticated user account. Requires JWT token and admin password in headers.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer .+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          },
+          {
+            "description": "Admin password for user deletion authorization",
+            "examples": [
+              "admin_secret_password"
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "x-admin-password"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/media/": {
+      "post": {
+        "summary": "Create new media content",
+        "description": "Creates a new media content. Requires JWT authentication. Increments user's rating_count.",
+        "tags": [
+          "Media"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                "description": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "category": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "game"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "video"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "artwork"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "music"
+                      ]
+                    }
+                  ]
+                },
+                "thumbnail_url": {
+                  "format": "uri",
+                  "type": "string"
+                },
+                "content_url": {
+                  "format": "uri",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "title",
+                "description",
+                "category",
+                "thumbnail_url",
+                "content_url"
+              ]
+            }
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "game"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "video"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "artwork"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "music"
+                      ]
+                    }
+                  ]
+                },
+                "thumbnail_url": {
+                  "type": "string"
+                },
+                "content_url": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "media_id",
+                "title",
+                "description",
+                "category",
+                "thumbnail_url",
+                "content_url",
+                "created_at",
+                "updated_at"
+              ]
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Password confirmation does not match",
+                    "Invalid input"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List all media contents",
+        "description": "Lists all media contents with pagination, filtering and sorting. Requires JWT authentication.",
+        "tags": [
+          "Media"
+        ],
+        "parameters": [
+          {
+            "minimum": 1,
+            "default": 1,
+            "type": "integer",
+            "required": false,
+            "in": "query",
+            "name": "page"
+          },
+          {
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10,
+            "type": "integer",
+            "required": false,
+            "in": "query",
+            "name": "limit"
+          },
+          {
+            "default": "created_at",
+            "type": "string",
+            "required": false,
+            "in": "query",
+            "name": "sortBy"
+          },
+          {
+            "default": "DESC",
+            "anyOf": [
+              {
+                "const": "ASC",
+                "type": "string"
+              },
+              {
+                "const": "DESC",
+                "type": "string"
+              }
+            ],
+            "required": false,
+            "in": "query",
+            "name": "sortOrder"
+          },
+          {
+            "anyOf": [
+              {
+                "const": "game",
+                "type": "string"
+              },
+              {
+                "const": "video",
+                "type": "string"
+              },
+              {
+                "const": "artwork",
+                "type": "string"
+              },
+              {
+                "const": "music",
+                "type": "string"
+              }
+            ],
+            "required": false,
+            "in": "query",
+            "name": "category"
+          },
+          {
+            "type": "string",
+            "required": false,
+            "in": "query",
+            "name": "title"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "media_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      },
+                      "category": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "game"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "video"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "artwork"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "music"
+                            ]
+                          }
+                        ]
+                      },
+                      "thumbnail_url": {
+                        "type": "string"
+                      },
+                      "content_url": {
+                        "type": "string"
+                      },
+                      "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "media_id",
+                      "title",
+                      "description",
+                      "category",
+                      "thumbnail_url",
+                      "content_url",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                },
+                "pagination": {
+                  "type": "object",
+                  "properties": {
+                    "page": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "page",
+                    "limit",
+                    "total",
+                    "totalPages"
+                  ]
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/media/{id}": {
+      "get": {
+        "summary": "Get media content by ID",
+        "description": "Retrieves a specific media content by its ID. Requires JWT authentication.",
+        "tags": [
+          "Media"
+        ],
+        "parameters": [
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "name": "id"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "game"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "video"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "artwork"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "music"
+                      ]
+                    }
+                  ]
+                },
+                "thumbnail_url": {
+                  "type": "string"
+                },
+                "content_url": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "media_id",
+                "title",
+                "description",
+                "category",
+                "thumbnail_url",
+                "content_url",
+                "created_at",
+                "updated_at"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update media content",
+        "description": "Updates a media content by its ID. Requires JWT authentication.",
+        "tags": [
+          "Media"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "type": "string"
+                },
+                "description": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "category": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "game"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "video"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "artwork"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "music"
+                      ]
+                    }
+                  ]
+                },
+                "thumbnail_url": {
+                  "format": "uri",
+                  "type": "string"
+                },
+                "content_url": {
+                  "format": "uri",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "name": "id"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "category": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": [
+                        "game"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "video"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "artwork"
+                      ]
+                    },
+                    {
+                      "type": "string",
+                      "enum": [
+                        "music"
+                      ]
+                    }
+                  ]
+                },
+                "thumbnail_url": {
+                  "type": "string"
+                },
+                "content_url": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "media_id",
+                "title",
+                "description",
+                "category",
+                "thumbnail_url",
+                "content_url",
+                "created_at",
+                "updated_at"
+              ]
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Password confirmation does not match",
+                    "Invalid input"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete media content",
+        "description": "Deletes a media content by its ID. Requires JWT authentication.",
+        "tags": [
+          "Media"
+        ],
+        "parameters": [
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "name": "id"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Media content deleted successfully"
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/ratings/": {
+      "post": {
+        "summary": "Create new rating",
+        "description": "Creates a new rating for a media content. Requires JWT authentication. Users can only rate each media once.",
+        "tags": [
+          "Rating"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "stars": {
+                  "minimum": 1,
+                  "maximum": 5,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "media_id",
+                "stars"
+              ]
+            }
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "rating_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "stars": {
+                  "minimum": 1,
+                  "maximum": 5,
+                  "type": "integer"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rating_id",
+                "user_id",
+                "media_id",
+                "stars",
+                "created_at",
+                "updated_at"
+              ]
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Password confirmation does not match",
+                    "Invalid input"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List all ratings",
+        "description": "Lists all ratings with pagination, filtering and sorting. Requires JWT authentication.",
+        "tags": [
+          "Rating"
+        ],
+        "parameters": [
+          {
+            "minimum": 1,
+            "default": 1,
+            "type": "integer",
+            "required": false,
+            "in": "query",
+            "name": "page"
+          },
+          {
+            "minimum": 1,
+            "maximum": 100,
+            "default": 10,
+            "type": "integer",
+            "required": false,
+            "in": "query",
+            "name": "limit"
+          },
+          {
+            "default": "created_at",
+            "type": "string",
+            "required": false,
+            "in": "query",
+            "name": "sortBy"
+          },
+          {
+            "default": "DESC",
+            "anyOf": [
+              {
+                "const": "ASC",
+                "type": "string"
+              },
+              {
+                "const": "DESC",
+                "type": "string"
+              }
+            ],
+            "required": false,
+            "in": "query",
+            "name": "sortOrder"
+          },
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": false,
+            "in": "query",
+            "name": "media_id"
+          },
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": false,
+            "in": "query",
+            "name": "user_id"
+          },
+          {
+            "minimum": 1,
+            "maximum": 5,
+            "type": "integer",
+            "required": false,
+            "in": "query",
+            "name": "stars"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "rating_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "media_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "stars": {
+                        "minimum": 1,
+                        "maximum": 5,
+                        "type": "integer"
+                      },
+                      "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "updated_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "rating_id",
+                      "user_id",
+                      "media_id",
+                      "stars",
+                      "created_at",
+                      "updated_at"
+                    ]
+                  }
+                },
+                "pagination": {
+                  "type": "object",
+                  "properties": {
+                    "page": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "totalPages": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "page",
+                    "limit",
+                    "total",
+                    "totalPages"
+                  ]
+                }
+              },
+              "required": [
+                "data",
+                "pagination"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/ratings/{id}": {
+      "get": {
+        "summary": "Get rating by ID",
+        "description": "Retrieves a specific rating by its ID. Requires JWT authentication.",
+        "tags": [
+          "Rating"
+        ],
+        "parameters": [
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "name": "id"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "rating_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "stars": {
+                  "minimum": 1,
+                  "maximum": 5,
+                  "type": "integer"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rating_id",
+                "user_id",
+                "media_id",
+                "stars",
+                "created_at",
+                "updated_at"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update rating",
+        "description": "Updates a rating by its ID. Users can only update their own ratings. Requires JWT authentication.",
+        "tags": [
+          "Rating"
+        ],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "stars": {
+                  "minimum": 1,
+                  "maximum": 5,
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "name": "id"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "rating_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "stars": {
+                  "minimum": 1,
+                  "maximum": 5,
+                  "type": "integer"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rating_id",
+                "user_id",
+                "media_id",
+                "stars",
+                "created_at",
+                "updated_at"
+              ]
+            }
+          },
+          "400": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Password confirmation does not match",
+                    "Invalid input"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "You can only update your own ratings",
+                    "You can only delete your own ratings",
+                    "Access denied"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete rating",
+        "description": "Deletes a rating by its ID. Users can only delete their own ratings. Requires JWT authentication.",
+        "tags": [
+          "Rating"
+        ],
+        "parameters": [
+          {
+            "format": "uuid",
+            "type": "string",
+            "required": true,
+            "in": "path",
+            "name": "id"
+          },
+          {
+            "description": "JWT token in format: Bearer \u003Ctoken\u003E",
+            "pattern": "^Bearer\\s+.+$",
+            "examples": [
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            ],
+            "type": "string",
+            "required": true,
+            "in": "header",
+            "name": "authorization"
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Rating deleted successfully"
+          },
+          "401": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Token not provided",
+                    "Invalid token",
+                    "Invalid credentials"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "403": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "You can only update your own ratings",
+                    "You can only delete your own ratings",
+                    "Access denied"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "404": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "User not found"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          },
+          "500": {
+            "description": "Default Response",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "examples": [
+                    "Internal server error",
+                    "JWT secret not configured"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "message"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "host": "localhost:3333",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "Enter your JWT token in the format: Bearer \u003Ctoken\u003E"
+    }
+  },
+  "tags": [
+    {
+      "name": "Users",
+      "description": "User management and authentication endpoints"
+    },
+    {
+      "name": "Media",
+      "description": "Media content management endpoints"
+    },
+    {
+      "name": "Rating",
+      "description": "Rating management endpoints"
+    },
+    {
+      "name": "health",
+      "description": "Health check endpoints"
+    }
+  ]
+}
