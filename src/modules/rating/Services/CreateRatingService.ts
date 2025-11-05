@@ -29,12 +29,6 @@ export class CreateRatingService {
       throw new AppError('Stars must be between 1 and 5', 400);
     }
 
-    const existingRating = await this.ratingRepository.findByUserAndMedia(userId, data.media_id);
-
-    if (existingRating) {
-      throw new AppError('User has already rated this media content', 400);
-    }
-
     const rating = await this.ratingRepository.create(data, userId);
 
     return rating;

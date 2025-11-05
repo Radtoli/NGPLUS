@@ -65,14 +65,12 @@ describe('CreateRatingService', () => {
 
       mockUserRepository.findById.mockResolvedValue(mockUser as any);
       mockMediaRepository.findById.mockResolvedValue(mockMedia as any);
-      mockRatingRepository.findByUserAndMedia.mockResolvedValue(null);
       mockRatingRepository.create.mockResolvedValue(mockRating as any);
 
       const result = await createRatingService.execute(ratingData, userId);
 
       expect(mockUserRepository.findById).toHaveBeenCalledWith(userId);
       expect(mockMediaRepository.findById).toHaveBeenCalledWith(ratingData.media_id);
-      expect(mockRatingRepository.findByUserAndMedia).toHaveBeenCalledWith(userId, ratingData.media_id);
       expect(mockRatingRepository.create).toHaveBeenCalledWith(ratingData, userId);
       expect(result).toEqual(mockRating);
     });
@@ -148,30 +146,41 @@ describe('CreateRatingService', () => {
       expect(mockRatingRepository.create).not.toHaveBeenCalled();
     });
 
-    it('should throw an error if user already rated this media', async () => {
+    it('should allow user to rate the same media multiple times', async () => {
       const userId = '123';
       const ratingData = {
         media_id: '456',
         stars: 4,
       };
 
-      const existingRating = {
+      const mockUser = { user_id: userId };
+      const mockMedia = { media_id: ratingData.media_id };
+      const mockRating = {
         rating_id: '789',
+        ...ratingData,
         user_id: userId,
-        media_id: ratingData.media_id,
-        stars: 3,
       };
 
-      mockUserRepository.findById.mockResolvedValue({ user_id: userId } as any);
-      mockMediaRepository.findById.mockResolvedValue({ media_id: ratingData.media_id } as any);
-      mockRatingRepository.findByUserAndMedia.mockResolvedValue(existingRating as any);
+      mockUserRepository.findById.mockResolvedValue(mockUser as any);
+      mockMediaRepository.findById.mockResolvedValue(mockMedia as any);
+      mockRatingRepository.create.mockResolvedValue(mockRating as any);
 
-      await expect(createRatingService.execute(ratingData, userId)).rejects.toMatchObject({
-        message: 'User has already rated this media content',
-        statusCode: 400,
-      });
+      // First rating
+      const firstResult = await createRatingService.execute(ratingData, userId);
+      expect(firstResult).toEqual(mockRating);
 
-      expect(mockRatingRepository.create).not.toHaveBeenCalled();
+      // Second rating with different stars
+      const secondRatingData = { ...ratingData, stars: 5 };
+      const secondMockRating = {
+        rating_id: '790',
+        ...secondRatingData,
+        user_id: userId,
+      };
+      mockRatingRepository.create.mockResolvedValue(secondMockRating as any);
+
+      const secondResult = await createRatingService.execute(secondRatingData, userId);
+      expect(secondResult).toEqual(secondMockRating);
+      expect(mockRatingRepository.create).toHaveBeenCalledTimes(2);
     });
   });
 });
