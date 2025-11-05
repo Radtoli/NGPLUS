@@ -2,11 +2,11 @@
   "name": "ngplustest",
   "version": "1.0.0",
   "description": "Backend project with Node.js, TypeScript and Fastify",
-  "main": "dist/server.js",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node -r tsconfig-paths/register dist/server.js",
     "lint": "eslint src --ext .ts",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -30,6 +30,7 @@
     "fastify": "^4.26.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
+    "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.27",
     "zod": "^3.22.4"
   },
