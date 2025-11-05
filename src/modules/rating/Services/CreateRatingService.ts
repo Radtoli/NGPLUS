@@ -29,6 +29,9 @@ export class CreateRatingService {
       throw new AppError('Stars must be between 1 and 5', 400);
     }
 
+
+    await this.userRepository.create({ ...user, rating_count: (user.rating_count || 0) + 1 });
+
     const rating = await this.ratingRepository.create(data, userId);
 
     return rating;
