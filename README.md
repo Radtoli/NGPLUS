@@ -211,6 +211,11 @@ npm run dev              # Start development server with hot reload
 npm run build            # Build TypeScript to JavaScript
 npm start                # Start production server (requires build first)
 
+# Testing
+npm test                 # Run all unit tests
+npm run test:watch       # Run tests in watch mode
+npm run test:coverage    # Run tests with coverage report
+
 # Database
 npm run typeorm migration:run     # Run pending migrations
 npm run typeorm migration:revert  # Revert last migration
@@ -218,7 +223,6 @@ npm run typeorm migration:create  # Create new migration
 
 # Code Quality
 npm run lint             # Run ESLint
-npm test                 # Run tests (when implemented)
 ```
 
 ## 🏗️ Architecture
@@ -286,9 +290,91 @@ src/modules/your-module/
 
 ## 🧪 Testing
 
+This project includes comprehensive unit tests for all services using Jest and ts-jest.
+
+### Running Tests
+
 ```bash
+# Run all tests
 npm test
+
+# Run tests in watch mode (useful during development)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
 ```
+
+### Test Structure
+
+Tests are organized by module and service, following the same structure as the source code:
+
+```
+src/modules/
+├── users/
+│   └── services/
+│       └── __tests__/
+│           ├── RegisterUserService.test.ts
+│           ├── LoginUserService.test.ts
+│           ├── UpdateUserService.test.ts
+│           └── DeleteUserService.test.ts
+├── media/
+│   └── Services/
+│       └── __tests__/
+│           ├── CreateMediaService.test.ts
+│           ├── GetMediaService.test.ts
+│           ├── ListMediaService.test.ts
+│           ├── UpdateMediaService.test.ts
+│           └── DeleteMediaService.test.ts
+└── rating/
+    └── Services/
+        └── __tests__/
+            ├── CreateRatingService.test.ts
+            ├── GetRatingService.test.ts
+            ├── ListRatingService.test.ts
+            ├── UpdateRatingService.test.ts
+            └── DeleteRatingService.test.ts
+```
+
+### Test Coverage
+
+The tests cover:
+
+- ✅ **Users Module**
+  - User registration with validation
+  - User login and JWT token generation
+  - User profile updates
+  - User deletion with admin password
+  
+- ✅ **Media Module**
+  - Media content creation
+  - Media retrieval (single and list)
+  - Media updates
+  - Media deletion
+  
+- ✅ **Rating Module**
+  - Rating creation with validations
+  - Rating retrieval (single and list)
+  - Rating updates (owner validation)
+  - Rating deletion (owner validation)
+
+### Test Features
+
+- **Mocked Dependencies**: All repository dependencies are mocked using Jest
+- **Error Scenarios**: Each service tests both success and error cases
+- **Validation Testing**: Tests verify input validation (e.g., password confirmation, star ratings)
+- **Authorization Testing**: Tests verify user permissions (e.g., only owners can update/delete)
+- **Environment Variables**: Tests handle environment configuration (e.g., JWT_SECRET, ADMIN_PASSWORD)
+
+### Coverage Report
+
+After running `npm run test:coverage`, you can find the detailed coverage report in the `coverage/` directory. Open `coverage/lcov-report/index.html` in your browser to view the interactive coverage report.
+
+The coverage configuration excludes:
+- Infrastructure code (database, HTTP, containers)
+- DTOs and enums
+- Main server entry point
+- Type definitions
 
 ## 🔧 Environment Variables
 
